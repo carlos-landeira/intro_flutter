@@ -18,28 +18,28 @@ class NotaFiscal {
 
   NotaFiscal({this.emissao, this.cliente, this.endereco, this.numero});
 
-  double? calcularValorTotal() {
-    double total = 0.0;
-    for (int i = 0; i < itens.length; i++) {
-      total += itens[i].getValorTotal();
-    }
-    return total;
+  double calcularValorTotal() {
+    return itens.map((e) => e.getValorTotal()).reduce((a, b) => a + b);
   }
 
   double? calcularTotalDescontos() {
-    double descontos = 0.0;
-    for (int i = 0; i < itens.length; i++) {
-      descontos += itens[i].desconto;
-    }
-    return descontos;
+    return itens.map((e) => e.desconto).reduce((a, b) => a + b);
   }
 
-  double? calcularTotalAcrescimos() {
-    double acrescimos = 0.0;
-    for (int i = 0; i < itens.length; i++) {
-      acrescimos += itens[i].acrescimo;
-    }
-    return acrescimos;
+  double calcularTotalAcrescimos() {
+    return itens.map((e) => e.acrescimo).reduce((a, b) => a + b);
+  }
+
+  bool possuiDesconto(){
+    return itens.any((i) => i.desconto > 0 ? true : false);
+  }
+
+  List<ItemNF> itensComDesconto(){
+    return itens.where((i) => i.desconto > 0).toList();
+  }
+
+  String getStrItens() {
+    return itens.map((i) => "${i.numSeq}: ${i.produto}").join(", ");
   }
 
   ItemNF? getProdutoMaisBarato() {
@@ -71,6 +71,12 @@ class NotaFiscal {
       required double valor,
       double desconto = 0.0,
       double acrescimo = 0.0}) {
+    if (valor == 0.0) {
+      throw Exception('Valor não pode ser zero');
+    }
+    if (produto == '') {
+      throw Exception("Produto precisa ser informado");
+    }
     ItemNF item = ItemNF(
         numSeq: itens.length + 1,
         produto: produto,
@@ -111,11 +117,11 @@ void mainNF() {
       emissao: DateTime(2022, 4, 6),
       endereco: "Rua A",
       numero: 546);
-  nota.addItem(produto: 'Caderno', valor: 25.0);
+  nota.addItem(produto: 'Caderno', valor: 25.0, desconto: 10.0);
   nota.addItem(produto: 'Lanterna', valor: 15.0);
   nota.addItem(produto: 'Caneta', valor: 2.0);
   print('Total: ${nota.calcularValorTotal()}');
-  print(nota.calcularTotalDescontos());
+  print('desconto: ${nota.calcularTotalDescontos()}');
   print('Mais barato: ${nota.getProdutoMaisBarato()}');
   print('Mais caro: ${nota.getProdutoMaisCaro()}');
 }

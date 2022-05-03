@@ -62,7 +62,7 @@ class _MyHomePageState extends State<MyHomePage> {
       _counter++;
     });
 
-    mainEntidades();
+    // mainEntidades();
     mainNF();
   }
 
